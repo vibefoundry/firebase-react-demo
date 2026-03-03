@@ -8,11 +8,13 @@ A React (Vite) application that visualizes VIP retail sales data. Students will 
 
 ## Data Location
 
-- **XLSX file**: `public/sales_data/data.xlsx` — this is the ONLY data source. Do NOT search for CSV files, databases, or APIs.
-- **Sheet name**: `VIP` — 788 rows, 9 columns.
-- **Data dictionary**: See `DATA_DICTIONARY.md` for every column name, type, and example value.
+- **Data folder**: `public/sales_data/` — place `.xlsx` files here. The app auto-discovers all `.xlsx` files in this folder.
+- **Default file**: `data.xlsx` (VIP sheet, 788 rows, 9 columns).
+- **File selector**: The app has a dropdown that lists all `.xlsx` files in the folder. Users can switch between files and the same filtering/table logic applies to each.
+- **Data dictionary**: See `DATA_DICTIONARY.md` for column definitions (based on `data.xlsx`, but the app handles any XLSX structure).
 - **Date quirk**: Date columns are Excel serial numbers. Convert with `new Date((serial - 25569) * 86400000)` in JS or `pd.to_datetime(serial, unit='D', origin='1899-12-30')` in Python/pandas.
 - **Zip codes** may lose leading zeros — always treat as strings.
+- **Adding new files**: Just drop a `.xlsx` file into `public/sales_data/` and refresh — the dropdown will pick it up automatically.
 
 ## Tech Stack — Already Installed
 
@@ -59,7 +61,7 @@ A React (Vite) application that visualizes VIP retail sales data. Students will 
 
 ## Do NOT
 
-- Do NOT search the filesystem for data files — the data is at `public/sales_data/data.xlsx`
+- Do NOT search the filesystem for data files — the data is in `public/sales_data/`
 - Do NOT install `xlsx`, `react`, `react-dom`, `vite` — they are already installed
 - Do NOT install `pandas`, `numpy`, `openpyxl` via pip — they are provided by dev.nix
 - Do NOT create a new React project or run `create-react-app` / `create-vite`

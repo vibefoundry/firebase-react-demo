@@ -10,12 +10,31 @@ h1 {
   margin-bottom: 0.25rem;
 }
 
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.file-select {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  background: #fff;
+  cursor: pointer;
+}
+
+.file-select:hover {
+  border-color: #0d6efd;
+}
+
 .count {
-  display: block;
-  text-align: center;
   font-size: 0.9rem;
   color: #666;
-  margin-bottom: 1rem;
 }
 
 .table-wrapper {

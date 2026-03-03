@@ -20,6 +20,8 @@ function isDateColumn(header) {
 }
 
 function App() {
+  const [files, setFiles] = useState([])
+  const [selectedFile, setSelectedFile] = useState('')
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -28,8 +30,25 @@ function App() {
   const [dropdownSearch, setDropdownSearch] = useState('')
   const dropdownRef = useRef(null)
 
+  // Fetch the list of available files
   useEffect(() => {
-    fetch('/sales_data/data.xlsx')
+    fetch('/__files')
+      .then((res) => (res.ok ? res.json() : []))
+      .catch(() => [])
+      .then((list) => {
+        if (list.length === 0) list = ['data.xlsx']
+        setFiles(list)
+        setSelectedFile(list[0])
+      })
+  }, [])
+
+  // Load the selected file
+  useEffect(() => {
+    if (!selectedFile) return
+    setLoading(true)
+    setError(null)
+    setColumnFilters({})
+    fetch(`/sales_data/${selectedFile}`)
       .then((response) => {
         if (!response.ok) throw new Error('Failed to fetch data')
         return response.arrayBuffer()
@@ -47,7 +66,7 @@ function App() {
         setError(err.message)
         setLoading(false)
       })
-  }, [])
+  }, [selectedFile])
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -162,9 +181,24 @@ function App() {
   return (
     <div className="container">
       <h1>VIP Sales Data</h1>
-      <span className="count">
-        Showing {filteredData.length} of {data.length} records
-      </span>
+      <div className="toolbar">
+        {files.length > 1 && (
+          <select
+            className="file-select"
+            value={selectedFile}
+            onChange={(e) => setSelectedFile(e.target.value)}
+          >
+            {files.map((f) => (
+              <option key={f} value={f}>
+                {f}
+              </option>
+            ))}
+          </select>
+        )}
+        <span className="count">
+          Showing {filteredData.length} of {data.length} records
+        </span>
+      </div>
       <div className="table-wrapper">
         <table className="vip-table">
           <thead>

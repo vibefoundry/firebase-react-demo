@@ -24,12 +24,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-DATA_PATH = Path(__file__).resolve().parent.parent / "public" / "sales_data" / "data.xlsx"
+DATA_DIR = Path(__file__).resolve().parent.parent / "public" / "sales_data"
 
 
-def load_data() -> pd.DataFrame:
-    """Load the XLSX data and return a DataFrame with cleaned types."""
-    df = pd.read_excel(DATA_PATH, sheet_name="VIP", engine="openpyxl")
+def load_data(filename: str = "data.xlsx") -> pd.DataFrame:
+    """Load an XLSX file from sales_data and return a DataFrame with cleaned types."""
+    df = pd.read_excel(DATA_DIR / filename, engine="openpyxl")
     # Convert Excel serial dates to proper datetime
     for col in df.columns:
         if "date" in col.lower():
@@ -45,10 +45,16 @@ def health():
     return {"status": "ok"}
 
 
+@app.get("/api/files")
+def list_files():
+    """Return a list of .xlsx files in the sales_data directory."""
+    return [f.name for f in sorted(DATA_DIR.glob("*.xlsx"))]
+
+
 @app.get("/api/data")
-def get_data():
-    """Return all sales data as JSON."""
-    df = load_data()
+def get_data(file: str = "data.xlsx"):
+    """Return sales data as JSON. Pass ?file=other.xlsx to load a different file."""
+    df = load_data(file)
     return df.to_dict(orient="records")
 
 
