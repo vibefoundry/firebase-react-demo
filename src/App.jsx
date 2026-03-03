@@ -26,7 +26,11 @@ function App() {
   const [rows, setRows] = useState([])
   const [totalCount, setTotalCount] = useState(0)
   const [offset, setOffset] = useState(0)
-  const limit = 1000
+  const limit = 500
+
+  // Column pagination
+  const [visibleColCount, setVisibleColCount] = useState(100)
+  const [totalColCount, setTotalColCount] = useState(0)
 
   // UI
   const [loading, setLoading] = useState(true)
@@ -74,6 +78,8 @@ function App() {
     setFilterValues({})
     setOffset(0)
     setRows([])
+    setVisibleColCount(100)
+    setTotalColCount(0)
 
     fetch(`/api/schema?file=${encodeURIComponent(selectedFile)}`)
       .then((res) => {
@@ -99,7 +105,7 @@ function App() {
 
     Promise.all([
       fetch(
-        `/api/data?file=${encodeURIComponent(selectedFile)}&filters=${filtersParam}&offset=${offset}&limit=${limit}`,
+        `/api/data?file=${encodeURIComponent(selectedFile)}&filters=${filtersParam}&offset=${offset}&limit=${limit}&col_limit=${visibleColCount}`,
         { signal: controller.signal }
       ).then((r) => r.json()),
       fetch(
@@ -109,6 +115,7 @@ function App() {
     ])
       .then(([dataRes, countRes]) => {
         setRows(dataRes.rows)
+        setTotalColCount(dataRes.col_total)
         setTotalCount(countRes.total)
         setLoadingData(false)
       })
@@ -120,7 +127,7 @@ function App() {
       })
 
     return () => controller.abort()
-  }, [selectedFile, schema, filtersParam, offset, limit])
+  }, [selectedFile, schema, filtersParam, offset, limit, visibleColCount])
 
   // ---- Effect 4: On dropdown open → fetch cascading values ----
   useEffect(() => {
@@ -219,6 +226,18 @@ function App() {
     setDropdownSearch('')
   }
 
+  // ---- Column pagination ----
+  const visibleColumns = useMemo(() => {
+    if (!schema) return []
+    return schema.columns.slice(0, visibleColCount)
+  }, [schema, visibleColCount])
+
+  const hasMoreColumns = totalColCount > visibleColCount
+
+  function showMoreColumns() {
+    setVisibleColCount((prev) => prev + 100)
+  }
+
   // ---- Pagination ----
   const totalPages = Math.max(1, Math.ceil(totalCount / limit))
   const currentPage = Math.floor(offset / limit) + 1
@@ -245,13 +264,14 @@ function App() {
         </select>
         <span className="count">
           {loadingData ? 'Loading...' : `Showing ${rows.length} of ${totalCount} records`}
+          {hasMoreColumns && ` · ${visibleColCount} of ${totalColCount.toLocaleString()} columns`}
         </span>
       </div>
       <div className="table-wrapper">
         <table className="vip-table">
           <thead>
             <tr>
-              {schema.columns.map((col) => (
+              {visibleColumns.map((col) => (
                 <th key={col.name} className="filter-th">
                   <div className="th-content">
                     <span className="th-label">{col.name}</span>
@@ -348,18 +368,26 @@ function App() {
                   )}
                 </th>
               ))}
+              {hasMoreColumns && (
+                <th className="show-more-col-th">
+                  <button className="show-more-col-btn" onClick={showMoreColumns}>
+                    Show 100 more columns
+                  </button>
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
             {rows.map((row, rowIndex) => (
               <tr key={rowIndex}>
-                {schema.columns.map((col) => (
+                {visibleColumns.map((col) => (
                   <td key={col.name}>
                     {col.type === 'date'
                       ? formatDate(row[col.name])
                       : row[col.name] ?? ''}
                   </td>
                 ))}
+                {hasMoreColumns && <td />}
               </tr>
             ))}
           </tbody>

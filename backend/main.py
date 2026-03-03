@@ -191,12 +191,17 @@ def get_data(
     file: str = "data.xlsx",
     filters: str = "{}",
     offset: int = 0,
-    limit: int = 1000,
+    limit: int = 500,
+    col_limit: int = 0,
 ):
     """Return paginated, filtered data rows."""
     df = get_dataframe(file)
     filtered = apply_filters(df, json.loads(filters))
     page = filtered.slice(offset, limit)
+
+    col_total = len(page.columns)
+    if col_limit > 0:
+        page = page.select(page.columns[:col_limit])
 
     # Serialize — dates become ISO strings
     rows = page.to_dicts()
@@ -204,7 +209,7 @@ def get_data(
         for k, v in row.items():
             if hasattr(v, "isoformat"):
                 row[k] = v.isoformat()
-    return {"rows": rows, "offset": offset, "limit": limit}
+    return {"rows": rows, "offset": offset, "limit": limit, "col_total": col_total}
 
 
 @app.get("/api/count")

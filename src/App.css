@@ -261,6 +261,31 @@ h1 {
   color: #666;
 }
 
+/* Show more columns button */
+.show-more-col-th {
+  background-color: #f8f9fa;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  vertical-align: middle;
+}
+
+.show-more-col-btn {
+  background: #e7f1ff;
+  border: 1px solid #0d6efd;
+  color: #0d6efd;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.show-more-col-btn:hover {
+  background: #0d6efd;
+  color: #fff;
+}
+
 /* Loading state in filter dropdown */
 .dropdown-loading {
   padding: 12px;
