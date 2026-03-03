@@ -249,7 +249,7 @@ function App() {
 
   return (
     <div className="container">
-      <h1>VIP Sales Data</h1>
+      <h1>File Preview</h1>
       <div className="toolbar">
         <select
           className="file-select"
