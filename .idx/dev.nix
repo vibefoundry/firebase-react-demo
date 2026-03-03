@@ -9,6 +9,9 @@
     (pkgs.python3.withPackages (ps: with ps; [
       pandas
       numpy
+      openpyxl
+      fastapi
+      uvicorn
     ]))
   ];
   # Sets environment variables in the workspace
@@ -23,8 +26,9 @@
       # Runs when a workspace is first created with this `dev.nix` file
       onCreate = {
         npm-install = "npm i --no-audit --no-progress --timing";
+        pip-install = "pip install -r backend/requirements.txt";
         # Open editors for the following files by default, if they exist:
-        default.openFiles = [ "src/App.tsx" "src/App.ts" "src/App.jsx" "src/App.js" ];
+        default.openFiles = [ "src/App.jsx" "CLAUDE.md" ];
       };
       # To run something each time the workspace is (re)started, use the `onStart` hook
     };

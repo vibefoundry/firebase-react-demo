@@ -25,3 +25,13 @@ dist-ssr
 
 # Sales data
 public/sales_data/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+*.egg-info/
+
+# Screenshots
+*.png
